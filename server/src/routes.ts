@@ -7,6 +7,7 @@ import { SubmitFeedbackUsecase } from './use-cases/submitFeedbackUsecase';
 
 export const routes = express.Router();
 
+
 routes.post('/feedbacks', async (req, res) => {
 const {type, comment, screenshot} = req.body;
 

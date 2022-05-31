@@ -6,6 +6,8 @@ import {
   Text,
   TouchableOpacity
 } from 'react-native';
+
+import * as FileSystem from 'expo-file-system';
 import { ArrowLeft } from 'phosphor-react-native';
 import { captureScreen } from 'react-native-view-shot';
 
@@ -34,7 +36,7 @@ export function Form({
   const [isSendingFeedback, setIsSendingFeedback] = useState(false);
 
   const [screenshot, setScreenshot] = useState<string | null>(null);
-
+  const [comment, setComment] = useState('');
   const feedbackTypeInfo = feedbackTypes[feedbackType];
 
   function handleScreenshot() {
@@ -56,9 +58,17 @@ export function Form({
     }
     setIsSendingFeedback(true);
 
+    const screenshotBase64 = screenshot &&  await FileSystem.readAsStringAsync(screenshot,{encoding: 'base64'});
+
+
     try{
 
-      await api.post()
+      await api.post('/feedbacks',{
+        type: feedbackType,
+        screenshot: `data:image/png;base64,${screenshotBase64}`,
+        comment
+      });
+      onFeedbackSent();
 
     } catch(error) {
       console.log(error);
@@ -94,6 +104,7 @@ export function Form({
         placeholder="Algo não está funcionando bem? Queremos corrigir. Conte com detalhes o que está acontecedendo."
         placeholderTextColor={theme.colors.text_secondary}
         autoCorrect={false}
+        onChangeText={setComment}
       />
       <View style={styles.footer}>
         <Screenshot
